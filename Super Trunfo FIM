@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include <string.h>
+
+#define NUM_ATRIBUTOS 5
+
+// Estrutura para armazenar dados de um país
+typedef struct {
+    char nome[50];
+    int populacao;
+    float area;
+    float pib;
+    int pontos_turisticos;
+    float densidade_demografica; // população / área
+} Carta;
+
+void exibirAtributosDisponiveis(int usado[]) {
+    printf("\nEscolha um atributo:\n");
+    if (!usado[0]) printf("1. Populacao\n");
+    if (!usado[1]) printf("2. Area\n");
+    if (!usado[2]) printf("3. PIB\n");
+    if (!usado[3]) printf("4. Pontos Turisticos\n");
+    if (!usado[4]) printf("5. Densidade Demografica\n");
+}
+
+float obterValorAtributo(Carta c, int escolha) {
+    switch (escolha) {
+        case 1: return (float)c.populacao;
+        case 2: return c.area;
+        case 3: return c.pib;
+        case 4: return (float)c.pontos_turisticos;
+        case 5: return c.densidade_demografica;
+        default: return 0;
+    }
+}
+
+int atributoVencedor(float valor1, float valor2, int escolha) {
+    if (escolha == 5) // Densidade demográfica: menor vence
+        return (valor1 < valor2) ? 1 : (valor2 < valor1 ? 2 : 0);
+    else // Outros: maior vence
+        return (valor1 > valor2) ? 1 : (valor2 > valor1 ? 2 : 0);
+}
+
+int main() {
+    // Cartas pré-cadastradas
+    Carta carta1 = {"Brasil", 210000000, 8516000.0, 2200.0, 12, 24.65};
+    Carta carta2 = {"Japao", 126000000, 377975.0, 5100.0, 25, 333.3};
+
+    int usado[NUM_ATRIBUTOS] = {0, 0, 0, 0, 0};
+    int escolha1 = 0, escolha2 = 0;
+
+    // Escolha do primeiro atributo
+    while (escolha1 < 1 || escolha1 > 5) {
+        exibirAtributosDisponiveis(usado);
+        printf("Escolha o primeiro atributo (1-5): ");
+        scanf("%d", &escolha1);
+        if (escolha1 >= 1 && escolha1 <= 5) usado[escolha1 - 1] = 1;
+        else printf("\nOpcao invalida. Tente novamente.\n");
+    }
+
+    // Escolha do segundo atributo
+    while (escolha2 < 1 || escolha2 > 5 || usado[escolha2 - 1]) {
+        exibirAtributosDisponiveis(usado);
+        printf("Escolha o segundo atributo (diferente do primeiro): ");
+        scanf("%d", &escolha2);
+        if (escolha2 < 1 || escolha2 > 5 || usado[escolha2 - 1])
+            printf("\nOpcao invalida ou repetida. Tente novamente.\n");
+    }
+
+    float valor1_attr1 = obterValorAtributo(carta1, escolha1);
+    float valor2_attr1 = obterValorAtributo(carta2, escolha1);
+    float valor1_attr2 = obterValorAtributo(carta1, escolha2);
+    float valor2_attr2 = obterValorAtributo(carta2, escolha2);
+
+    float soma1 = valor1_attr1 + valor1_attr2;
+    float soma2 = valor2_attr1 + valor2_attr2;
+
+    // Resultado
+    printf("\n--- Resultado ---\n");
+    printf("Pais 1: %s\n", carta1.nome);
+    printf("Pais 2: %s\n", carta2.nome);
+    printf("\nComparando atributos %d e %d:\n", escolha1, escolha2);
+    printf("%s -> %.2f + %.2f = %.2f\n", carta1.nome, valor1_attr1, valor1_attr2, soma1);
+    printf("%s -> %.2f + %.2f = %.2f\n", carta2.nome, valor2_attr1, valor2_attr2, soma2);
+
+    if (soma1 > soma2)
+        printf("\n%s vence a rodada!\n", carta1.nome);
+    else if (soma2 > soma1)
+        printf("\n%s vence a rodada!\n", carta2.nome);
+    else
+        printf("\nEmpate!\n");
+
+    return 0;
+}
